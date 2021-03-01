@@ -4,5 +4,9 @@ import "github.com/google/uuid"
 
 type Allergen struct {
 	Id   uuid.UUID
-	name string
+	Name string
+}
+
+func (a Allergen) String() string {
+	return a.Name
 }
