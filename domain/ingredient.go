@@ -15,3 +15,7 @@ func (i Ingredient) String() string {
 	}
 	return i.Name + "(" + allergens + ")"
 }
+
+func (i *Ingredient) AddAllergen(allergen Allergen) {
+	i.Allergens = append(i.Allergens, allergen)
+}
