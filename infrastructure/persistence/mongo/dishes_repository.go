@@ -86,7 +86,7 @@ func (r DishesRepository) SaveDish(aggregate domain.DishAggregate) {
 	}
 }
 
-func (r DishesRepository) SetDbAndFixtures() {
+func (r DishesRepository) ConfigureDB() {
 	_, _ = r.collection.Indexes().CreateOne(
 		context.Background(),
 		mongo.IndexModel{
