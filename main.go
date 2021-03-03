@@ -1,27 +1,16 @@
 package main
 
 import (
-	"fmt"
-	"github.com/fcorrionero/go-restaurant/domain"
-	"github.com/google/uuid"
-	"time"
+	"net/http"
 )
 
 func main() {
-	var ingredients []domain.Ingredient
-
-	ingredient := domain.Ingredient{
-		Id:        uuid.UUID{},
-		Allergens: nil,
-		Name:      "Arroz",
+	repo := InitializeDishesRepository()
+	dishesController := InitializeDishesHttpController(repo)
+	http.HandleFunc("/name", dishesController.ByName)
+	http.HandleFunc("/id", dishesController.ById)
+	err := http.ListenAndServe(":8090", nil)
+	if err != nil {
+		panic(err)
 	}
-
-	ingredients = append(ingredients, ingredient)
-
-	dish := domain.DishAggregate{
-		Id:          uuid.New(),
-		Ingredients: ingredients,
-		DateTime:    time.Now(),
-	}
-	fmt.Println("RESTAURANT APP : " + dish.String())
 }
