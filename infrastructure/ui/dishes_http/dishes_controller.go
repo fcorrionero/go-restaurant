@@ -28,7 +28,7 @@ func (dC DishesHttpController) ById(w http.ResponseWriter, r *http.Request) {
 }
 
 func (dC DishesHttpController) ByName(w http.ResponseWriter, r *http.Request) {
-	query := find_dish_by_name.Query{Name: "Paella"}
+	query := find_dish_by_name.Query{Name: "PaElL"}
 	dish := dC.findDishByNameQueryHandler.Handle(query)
 	fmt.Fprintf(w, dish.String()+"\n")
 }

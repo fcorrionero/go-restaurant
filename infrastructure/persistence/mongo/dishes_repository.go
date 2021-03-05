@@ -6,6 +6,7 @@ import (
 	"github.com/fcorrionero/go-restaurant/domain"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -68,10 +69,15 @@ func (r DishesRepository) FindDishById(dishId uuid.UUID) domain.DishAggregate {
 func (r DishesRepository) FindDishByName(name string) domain.DishAggregate {
 	result := domain.DishAggregate{}
 
-	filter := bson.M{"name": name}
-	err := r.collection.FindOne(r.context, filter).Decode(&result)
+	// Search by name case insensitive with a regex expression
+	key := "name"
+	regex := bson.M{"$regex": primitive.Regex{Pattern: ".*" + name + ".*", Options: "i"}}
+	filter2 := bson.M{key: regex}
+
+	err := r.collection.FindOne(r.context, filter2).Decode(&result)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err.Error() + " " + name)
+		log.Println(filter2)
 	}
 	return result
 }
