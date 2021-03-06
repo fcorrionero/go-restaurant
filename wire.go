@@ -5,6 +5,7 @@ package main
 import (
 	"github.com/fcorrionero/go-restaurant/application/query/find_dish_by_id"
 	"github.com/fcorrionero/go-restaurant/application/query/find_dish_by_name"
+	"github.com/fcorrionero/go-restaurant/application/query/find_dishes_by_allergen"
 	"github.com/fcorrionero/go-restaurant/domain"
 	"github.com/fcorrionero/go-restaurant/infrastructure/persistence/mongo"
 	"github.com/fcorrionero/go-restaurant/infrastructure/ui/dishes_http"
@@ -17,7 +18,7 @@ func InitializeDishesRepository() domain.DishesRepository {
 }
 
 func InitializeDishesHttpController(dishesRepository domain.DishesRepository) dishes_http.DishesHttpController {
-	wire.Build(dishes_http.NewDishesHttpController, find_dish_by_id.New, find_dish_by_name.New)
+	wire.Build(dishes_http.NewDishesHttpController, find_dish_by_id.New, find_dish_by_name.New, find_dishes_by_allergen.New)
 	return dishes_http.DishesHttpController{}
 }
 
