@@ -49,8 +49,8 @@ func (r *DishesRepository) connect(userName string, password string, host string
 	return
 }
 
-func (r DishesRepository) FindDishesByAllergen(allergenId uuid.UUID) []domain.DishAggregate {
-	var dishes []domain.DishAggregate
+func (r DishesRepository) FindDishesByAllergenId(allergenId uuid.UUID) []*domain.DishAggregate {
+	var dishes []*domain.DishAggregate
 
 	return dishes
 }
@@ -99,4 +99,28 @@ func (r DishesRepository) ConfigureDB() {
 			Keys:    bson.D{{Key: "id", Value: 1}},
 			Options: options.Index().SetUnique(true),
 		})
+}
+
+func (r DishesRepository) FindDishesByAllergen(allergen string) []*domain.DishAggregate {
+	var dishes []*domain.DishAggregate
+
+	regex := bson.M{"$regex": primitive.Regex{Pattern: ".*" + allergen + ".*", Options: "i"}}
+	filter := bson.M{"ingredients.allergens.name": regex}
+	cursor, err := r.collection.Find(r.context, filter)
+	if err != nil {
+		log.Println(err)
+		return dishes
+	}
+	for cursor.Next(context.TODO()) {
+		// create a value into which the single document can be decoded
+		var d domain.DishAggregate
+		err := cursor.Decode(&d)
+		if err != nil {
+			log.Println(err)
+			return dishes
+		}
+		dishes = append(dishes, &d)
+	}
+	log.Println(filter)
+	return dishes
 }
