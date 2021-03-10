@@ -7,6 +7,7 @@ import (
 	"github.com/fcorrionero/go-restaurant/application/query/find_dishes_by_allergen"
 	"log"
 	"net/http"
+	"strings"
 )
 
 type DishesHttpController struct {
@@ -27,19 +28,45 @@ func NewDishesHttpController(
 	}
 }
 
-func (dC DishesHttpController) ById(w http.ResponseWriter, r *http.Request) {
-	dish := dC.findDishByIdQueryHandler.Handle(find_dish_by_id.Query{DishId: "ad61989c-4b56-4840-af4b-6e614f5afabf"})
+func (dC DishesHttpController) Search(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	id, idExists := query["id"]
+	if idExists && len(id) > 0 {
+		dC.byId(w, strings.Join(id, ""))
+		return
+	}
+
+	name, nameExists := query["name"]
+	if nameExists && len(name) > 0 {
+		dC.byName(w, strings.Join(name, ""))
+		return
+	}
+
+	allergen, aExists := query["allergen"]
+	if aExists && len(allergen) > 0 {
+		dC.byAllergen(w, strings.Join(allergen, ""))
+		return
+	}
+
+	fmt.Fprintf(w, "Dish(es) not found")
+}
+
+func (dC DishesHttpController) byId(w http.ResponseWriter, id string) {
+	// id : "ad61989c-4b56-4840-af4b-6e614f5afabf"
+	dish := dC.findDishByIdQueryHandler.Handle(find_dish_by_id.Query{DishId: id})
 	fmt.Fprintf(w, dish.String())
 }
 
-func (dC DishesHttpController) ByName(w http.ResponseWriter, r *http.Request) {
-	query := find_dish_by_name.Query{Name: "PaElL"}
+func (dC DishesHttpController) byName(w http.ResponseWriter, name string) {
+	// name : paella
+	query := find_dish_by_name.Query{Name: name}
 	dish := dC.findDishByNameQueryHandler.Handle(query)
 	fmt.Fprintf(w, dish.String()+"\n")
 }
 
-func (dC DishesHttpController) ByAllergen(w http.ResponseWriter, r *http.Request) {
-	query := find_dishes_by_allergen.Query{AllergenName: "Gluten"}
+func (dC DishesHttpController) byAllergen(w http.ResponseWriter, allergen string) {
+	// allergen : Gluten
+	query := find_dishes_by_allergen.Query{AllergenName: allergen}
 
 	dishes := dC.findDishByAllergenQueryHandler.Handle(query)
 
