@@ -1,0 +1,1 @@
+cat  dev/mysql/fixtures.sql | docker exec -i go_restaurant_mysql mysql -u root -pexample
