@@ -6,18 +6,25 @@
 package main
 
 import (
+	"database/sql"
 	"github.com/fcorrionero/go-restaurant/application/query/find_dish_by_id"
 	"github.com/fcorrionero/go-restaurant/application/query/find_dish_by_name"
 	"github.com/fcorrionero/go-restaurant/application/query/find_dishes_by_allergen"
 	"github.com/fcorrionero/go-restaurant/domain"
 	"github.com/fcorrionero/go-restaurant/infrastructure/persistence/mongo"
+	"github.com/fcorrionero/go-restaurant/infrastructure/persistence/mysql"
 	"github.com/fcorrionero/go-restaurant/infrastructure/ui/dishes_http"
+	"log"
+)
+
+import (
+	_ "github.com/go-sql-driver/mysql"
 )
 
 // Injectors from wire.go:
 
 func InitializeDishesRepository() domain.DishesRepository {
-	dishesRepository := NewDishesRepository()
+	dishesRepository := NewMongoDishesRepository()
 	return dishesRepository
 }
 
@@ -31,6 +38,27 @@ func InitializeDishesHttpController(dishesRepository domain.DishesRepository) di
 
 // wire.go:
 
-func NewDishesRepository() domain.DishesRepository {
+func NewMongoDishesRepository() domain.DishesRepository {
 	return mongo.New("root", "example", "0.0.0.0", "27017", "go-restaurant")
+}
+
+func NewMysqlAllergensRepository(db *sql.DB) domain.AllergensRepository {
+	return mysql.NewAllergensRepository("allergens", db)
+}
+
+func NewMysqlIngredientsRepository(db *sql.DB) domain.IngredientsRepository {
+	return mysql.NewIngredientsRepository("ingredients", db)
+}
+
+func NewMysqlDishesRepository(db *sql.DB) domain.DishesRepository {
+	return mysql.NewDishesRepository("dishes", db)
+}
+
+func StartMysqlDB() *sql.DB {
+	db, err := sql.Open("mysql", "root:example@/go_restaurant")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return db
 }
