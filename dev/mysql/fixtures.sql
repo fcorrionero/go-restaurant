@@ -6,8 +6,7 @@ CREATE TABLE IF NOT EXISTS dishes (
     id BINARY(16) PRIMARY KEY,
     id_uuid VARCHAR(40) NOT NULL,
     disn_name VARCHAR(255) NOT NULL,
-    created_at DATETIME NOT NULL,
-    ingredients JSON
+    created_at DATETIME NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS dishes_ingredients (
@@ -21,8 +20,7 @@ CREATE TABLE IF NOT EXISTS dishes_ingredients (
 CREATE TABLE IF NOT EXISTS ingredients (
     id BINARY(16) PRIMARY KEY,
     id_uuid VARCHAR(40) NOT NULL,
-    ingredient_name VARCHAR(255) NOT NULL,
-    allergens JSON
+    ingredient_name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ingredients_allergens (
