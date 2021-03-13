@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func NewDishesRepository(table string, db *sql.DB) DishesRepository {
+func NewDishesRepository(db *sql.DB) DishesRepository {
 	return DishesRepository{
 		table: "dishes",
 		db:    db,

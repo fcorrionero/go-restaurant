@@ -43,15 +43,15 @@ func NewMongoDishesRepository() domain.DishesRepository {
 }
 
 func NewMysqlAllergensRepository(db *sql.DB) domain.AllergensRepository {
-	return mysql.NewAllergensRepository("allergens", db)
+	return mysql.NewAllergensRepository(db)
 }
 
 func NewMysqlIngredientsRepository(db *sql.DB) domain.IngredientsRepository {
-	return mysql.NewIngredientsRepository("ingredients", db)
+	return mysql.NewIngredientsRepository(db)
 }
 
 func NewMysqlDishesRepository(db *sql.DB) domain.DishesRepository {
-	return mysql.NewDishesRepository("dishes", db)
+	return mysql.NewDishesRepository(db)
 }
 
 func StartMysqlDB() *sql.DB {

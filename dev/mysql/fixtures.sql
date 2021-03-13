@@ -9,6 +9,12 @@ CREATE TABLE IF NOT EXISTS dishes (
     created_at DATETIME NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS ingredients (
+    id BINARY(16) PRIMARY KEY,
+    id_uuid VARCHAR(40) NOT NULL,
+    ingredient_name VARCHAR(255) NOT NULL
+    );
+
 CREATE TABLE IF NOT EXISTS dishes_ingredients (
     dish_id binary,
     ingredient_id binary,
@@ -16,11 +22,10 @@ CREATE TABLE IF NOT EXISTS dishes_ingredients (
     FOREIGN KEY (ingredient_id) REFERENCES ingredients(id)
 );
 
-
-CREATE TABLE IF NOT EXISTS ingredients (
-    id BINARY(16) PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS allergens (
+    id BINARY(16) PRIMARY KEY ,
     id_uuid VARCHAR(40) NOT NULL,
-    ingredient_name VARCHAR(255) NOT NULL
+    allergen_name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS ingredients_allergens (
@@ -28,10 +33,4 @@ CREATE TABLE IF NOT EXISTS ingredients_allergens (
     ingredient_id binary,
     FOREIGN KEY (allergen_id) REFERENCES allergens(id),
     FOREIGN KEY (ingredient_id) REFERENCES ingredients(id)
-);
-
-CREATE TABLE IF NOT EXISTS allergens (
-    id BINARY(16) PRIMARY KEY ,
-    id_uuid VARCHAR(40) NOT NULL,
-    allergen_name VARCHAR(255) NOT NULL
 );

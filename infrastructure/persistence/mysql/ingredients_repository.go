@@ -5,9 +5,9 @@ import (
 	"github.com/fcorrionero/go-restaurant/domain"
 )
 
-func NewIngredientsRepository(table string, db *sql.DB) IngredientsRepository {
+func NewIngredientsRepository(db *sql.DB) IngredientsRepository {
 	return IngredientsRepository{
-		table: table,
+		table: "ingredients",
 		db:    db,
 	}
 }
