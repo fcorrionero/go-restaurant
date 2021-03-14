@@ -1,7 +1,11 @@
 package domain
 
+import "github.com/google/uuid"
+
 type IngredientsRepository interface {
 	FindByName(name string) *Ingredient
-	FindAllByIds(ids []int) []*Ingredient
-	Save(ingredient Ingredient)
+	FindById(id uuid.UUID) *Ingredient
+	FindAll() []*Ingredient
+	FindAllByAllergen(aId uuid.UUID) []*Ingredient
+	Save(ingredient *Ingredient)
 }

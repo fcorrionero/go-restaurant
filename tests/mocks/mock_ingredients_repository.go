@@ -9,6 +9,7 @@ import (
 
 	domain "github.com/fcorrionero/go-restaurant/domain"
 	gomock "github.com/golang/mock/gomock"
+	uuid "github.com/google/uuid"
 )
 
 // MockIngredientsRepository is a mock of IngredientsRepository interface.
@@ -34,18 +35,46 @@ func (m *MockIngredientsRepository) EXPECT() *MockIngredientsRepositoryMockRecor
 	return m.recorder
 }
 
-// FindAllByIds mocks base method.
-func (m *MockIngredientsRepository) FindAllByIds(arg0 []int) []*domain.Ingredient {
+// FindAll mocks base method.
+func (m *MockIngredientsRepository) FindAll() []*domain.Ingredient {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindAllByIds", arg0)
+	ret := m.ctrl.Call(m, "FindAll")
 	ret0, _ := ret[0].([]*domain.Ingredient)
 	return ret0
 }
 
-// FindAllByIds indicates an expected call of FindAllByIds.
-func (mr *MockIngredientsRepositoryMockRecorder) FindAllByIds(arg0 interface{}) *gomock.Call {
+// FindAll indicates an expected call of FindAll.
+func (mr *MockIngredientsRepositoryMockRecorder) FindAll() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAllByIds", reflect.TypeOf((*MockIngredientsRepository)(nil).FindAllByIds), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockIngredientsRepository)(nil).FindAll))
+}
+
+// FindAllByAllergen mocks base method.
+func (m *MockIngredientsRepository) FindAllByAllergen(arg0 uuid.UUID) []*domain.Ingredient {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindAllByAllergen", arg0)
+	ret0, _ := ret[0].([]*domain.Ingredient)
+	return ret0
+}
+
+// FindAllByAllergen indicates an expected call of FindAllByAllergen.
+func (mr *MockIngredientsRepositoryMockRecorder) FindAllByAllergen(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAllByAllergen", reflect.TypeOf((*MockIngredientsRepository)(nil).FindAllByAllergen), arg0)
+}
+
+// FindById mocks base method.
+func (m *MockIngredientsRepository) FindById(arg0 uuid.UUID) *domain.Ingredient {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindById", arg0)
+	ret0, _ := ret[0].(*domain.Ingredient)
+	return ret0
+}
+
+// FindById indicates an expected call of FindById.
+func (mr *MockIngredientsRepositoryMockRecorder) FindById(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindById", reflect.TypeOf((*MockIngredientsRepository)(nil).FindById), arg0)
 }
 
 // FindByName mocks base method.
@@ -63,7 +92,7 @@ func (mr *MockIngredientsRepositoryMockRecorder) FindByName(arg0 interface{}) *g
 }
 
 // Save mocks base method.
-func (m *MockIngredientsRepository) Save(arg0 domain.Ingredient) {
+func (m *MockIngredientsRepository) Save(arg0 *domain.Ingredient) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Save", arg0)
 }

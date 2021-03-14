@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS ingredients (
     );
 
 CREATE TABLE IF NOT EXISTS dishes_ingredients (
-    dish_id binary,
-    ingredient_id binary,
+    dish_id binary(16),
+    ingredient_id binary(16),
     FOREIGN KEY (dish_id) REFERENCES dishes(id),
     FOREIGN KEY (ingredient_id) REFERENCES ingredients(id)
 );
@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS allergens (
 );
 
 CREATE TABLE IF NOT EXISTS ingredients_allergens (
-    allergen_id binary,
-    ingredient_id binary,
+    allergen_id binary(16),
+    ingredient_id binary(16),
     FOREIGN KEY (allergen_id) REFERENCES allergens(id),
     FOREIGN KEY (ingredient_id) REFERENCES ingredients(id)
 );
