@@ -8,5 +8,5 @@ type Allergen struct {
 }
 
 func (a Allergen) String() string {
-	return a.Name
+	return a.Name + " " + a.Id.String()
 }

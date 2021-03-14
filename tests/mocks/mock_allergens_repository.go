@@ -9,6 +9,7 @@ import (
 
 	domain "github.com/fcorrionero/go-restaurant/domain"
 	gomock "github.com/golang/mock/gomock"
+	uuid "github.com/google/uuid"
 )
 
 // MockAllergensRepository is a mock of AllergensRepository interface.
@@ -34,18 +35,32 @@ func (m *MockAllergensRepository) EXPECT() *MockAllergensRepositoryMockRecorder 
 	return m.recorder
 }
 
-// FindAllById mocks base method.
-func (m *MockAllergensRepository) FindAllById(arg0 []int) []*domain.Allergen {
+// FindAll mocks base method.
+func (m *MockAllergensRepository) FindAll() []*domain.Allergen {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FindAllById", arg0)
+	ret := m.ctrl.Call(m, "FindAll")
 	ret0, _ := ret[0].([]*domain.Allergen)
 	return ret0
 }
 
-// FindAllById indicates an expected call of FindAllById.
-func (mr *MockAllergensRepositoryMockRecorder) FindAllById(arg0 interface{}) *gomock.Call {
+// FindAll indicates an expected call of FindAll.
+func (mr *MockAllergensRepositoryMockRecorder) FindAll() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAllById", reflect.TypeOf((*MockAllergensRepository)(nil).FindAllById), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockAllergensRepository)(nil).FindAll))
+}
+
+// FindById mocks base method.
+func (m *MockAllergensRepository) FindById(arg0 uuid.UUID) *domain.Allergen {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindById", arg0)
+	ret0, _ := ret[0].(*domain.Allergen)
+	return ret0
+}
+
+// FindById indicates an expected call of FindById.
+func (mr *MockAllergensRepositoryMockRecorder) FindById(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindById", reflect.TypeOf((*MockAllergensRepository)(nil).FindById), arg0)
 }
 
 // FindByName mocks base method.
@@ -63,7 +78,7 @@ func (mr *MockAllergensRepositoryMockRecorder) FindByName(arg0 interface{}) *gom
 }
 
 // Save mocks base method.
-func (m *MockAllergensRepository) Save(arg0 domain.Allergen) {
+func (m *MockAllergensRepository) Save(arg0 *domain.Allergen) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "Save", arg0)
 }
