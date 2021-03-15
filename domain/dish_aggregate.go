@@ -22,5 +22,23 @@ func (d DishAggregate) String() string {
 }
 
 func (d *DishAggregate) AddIngredient(ingredient Ingredient) {
-	d.Ingredients = append(d.Ingredients, ingredient)
+	exists := false
+	for _, i := range d.Ingredients {
+		if i.Id == ingredient.Id {
+			exists = true
+		}
+	}
+	if !exists {
+		d.Ingredients = append(d.Ingredients, ingredient)
+	}
+}
+
+func (d *DishAggregate) RemoveIngredient(ingredient Ingredient) {
+	var ingredients []Ingredient
+	for _, i := range d.Ingredients {
+		if i.Id != ingredient.Id {
+			ingredients = append(ingredients, i)
+		}
+	}
+	d.Ingredients = ingredients
 }

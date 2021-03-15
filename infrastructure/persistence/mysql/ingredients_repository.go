@@ -37,7 +37,67 @@ func (r IngredientsRepository) FindAll() []*domain.Ingredient {
 }
 
 func (r IngredientsRepository) FindAllByAllergen(aId uuid.UUID) []*domain.Ingredient {
-	panic("implement me")
+	var results []*domain.Ingredient
+	relSql := fmt.Sprintf(
+		"SELECT " +
+			"i.id_uuid, i.ingredient_name, a.id_uuid, a.allergen_name " +
+			"FROM ingredients i " +
+			"INNER JOIN ingredients_allergens ia on i.id = ia.ingredient_id " +
+			"INNER JOIN allergens a on ia.allergen_id = a.id " +
+			"WHERE ia.allergen_id = ? ORDER BY i.id_uuid")
+	sqlStmt, err := r.db.Prepare(relSql)
+	if nil != err {
+		log.Println(err.Error())
+		return results
+	}
+	defer func() {
+		err := sqlStmt.Close()
+		if nil != err {
+			log.Println(err.Error())
+		}
+	}()
+	bId, err := aId.MarshalBinary()
+	if err != nil {
+		log.Println(err.Error())
+		return results
+	}
+	rows, err := sqlStmt.Query(bId)
+	if err != nil {
+		log.Println(err.Error())
+		return results
+	}
+	var alId string
+	var iId string
+	var iName string
+	var aName string
+	var ingredient domain.Ingredient
+	for rows.Next() {
+		err := rows.Scan(&iId, &iName, &alId, &aName)
+		if err != nil {
+			log.Println(err.Error())
+			return results
+		}
+		fiId, _ := uuid.Parse(iId)
+		if fiId != ingredient.Id {
+			if len(ingredient.Name) > 0 {
+				results = append(results, &ingredient)
+			}
+			ingredient = domain.Ingredient{
+				Id:        fiId,
+				Allergens: nil,
+				Name:      iName,
+			}
+		}
+		faId, _ := uuid.Parse(alId)
+		allergen := domain.Allergen{
+			Id:   faId,
+			Name: aName,
+		}
+		ingredient.AddAllergen(allergen)
+	}
+	results = append(results, &ingredient)
+
+	return results
 }
 
 func (r IngredientsRepository) Save(ingredient *domain.Ingredient) {
