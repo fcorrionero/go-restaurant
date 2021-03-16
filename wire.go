@@ -35,7 +35,7 @@ func NewMongoDishesRepository() domain.DishesRepository {
 	return mongo.New("root", "example", "0.0.0.0", "27017", "go-restaurant")
 }
 
-func NewMysqlAllergensRepository(db *sql.DB) domain.AllergensRepository {
+func NewMysqlAllergensRepository(db *gorm.DB) domain.AllergensRepository {
 	return mysql.NewAllergensRepository(db)
 }
 

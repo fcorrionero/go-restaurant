@@ -1,19 +1,20 @@
 package mysql
 
 import (
-	"database/sql"
-	"fmt"
 	"github.com/fcorrionero/go-restaurant/domain"
+	"github.com/fcorrionero/go-restaurant/infrastructure/persistence/mysql/models"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"log"
+	"strings"
 )
 
 type AllergensRepository struct {
 	table string
-	db    *sql.DB
+	db    *gorm.DB
 }
 
-func NewAllergensRepository(db *sql.DB) AllergensRepository {
+func NewAllergensRepository(db *gorm.DB) AllergensRepository {
 	return AllergensRepository{
 		table: "allergens",
 		db:    db,
@@ -21,118 +22,70 @@ func NewAllergensRepository(db *sql.DB) AllergensRepository {
 }
 
 func (r AllergensRepository) FindByName(name string) *domain.Allergen {
-	result := domain.Allergen{}
-	sqlStmt := fmt.Sprintf("SELECT * FROM %s WHERE allergen_name = ?", r.table)
-	stmtOut, err := r.db.Prepare(sqlStmt)
-	if err != nil {
-		log.Println(err.Error())
-		return &result
-	}
-	defer func() {
-		err := stmtOut.Close()
-		if nil != err {
-			log.Println(err.Error())
-		}
-	}()
+	var result *domain.Allergen
+	var m models.Allergen
 
-	var sId, aName string
-	var bId []byte
-	err = stmtOut.QueryRow(name).Scan(&bId, &sId, &aName)
-	if err != nil {
-		log.Println(err.Error())
-		return &result
+	name = strings.ToUpper(name)
+	res := r.db.First(&m, "UPPER(allergen_name) LIKE ?", "%"+name+"%")
+	if res.Error != nil {
+		log.Println(res.Error)
+		return result
 	}
-	result.Id, err = uuid.Parse(sId)
-	result.Name = aName
-	if nil != err {
-		log.Println(err.Error())
-	}
-	return &result
+
+	result = r.allergenAggFromModel(m)
+	return result
 }
 
 func (r AllergensRepository) FindAll() []*domain.Allergen {
 	var results []*domain.Allergen
-	sqlStmt := fmt.Sprintf("SELECT * FROM %s", r.table)
-	rows, err := r.db.Query(sqlStmt)
-	if err != nil {
-		log.Println(err.Error())
+	var algs []models.Allergen
+
+	res := r.db.Find(&algs)
+	if res.Error != nil {
+		log.Println(res.Error)
 		return results
 	}
-	var sId, aName string
-	var bId []byte
-	for rows.Next() {
-		allergen := domain.Allergen{}
-		// get RawBytes from data
-		err = rows.Scan(&bId, &sId, &aName)
-		if err != nil {
-			log.Println(err.Error())
-			return results
-		}
-		allergen.Id, err = uuid.Parse(sId)
-		allergen.Name = aName
-		if nil != err {
-			log.Println(err.Error())
-		}
-
-		results = append(results, &allergen)
+	for _, a := range algs {
+		results = append(results, r.allergenAggFromModel(a))
 	}
+
 	return results
 }
 
 func (r AllergensRepository) FindById(id uuid.UUID) *domain.Allergen {
-	result := domain.Allergen{}
-	sqlStmt := fmt.Sprintf("SELECT * FROM %s WHERE id = ?", r.table)
-	stmtOut, err := r.db.Prepare(sqlStmt)
+	var result *domain.Allergen
+	var m models.Allergen
+	bId, err := id.MarshalBinary()
 	if err != nil {
 		log.Println(err.Error())
-		return &result
+		return result
 	}
-	defer func() {
-		err := stmtOut.Close()
-		if nil != err {
-			log.Println(err.Error())
-		}
-	}()
-
-	bsId, err := id.MarshalBinary()
-	if err != nil {
-		log.Println(err.Error())
-		return &result
-	}
-	var sId, aName string
-	var bId []byte
-	err = stmtOut.QueryRow(bsId).Scan(&bId, &sId, &aName)
-	if err != nil {
-		log.Println(err.Error())
-		return &result
-	}
-	result.Id, err = uuid.Parse(sId)
-	result.Name = aName
-	if nil != err {
-		log.Println(err.Error())
-	}
-	return &result
+	r.db.First(&m, "id = ?", bId)
+	result = r.allergenAggFromModel(m)
+	return result
 }
 
 func (r AllergensRepository) Save(allergen *domain.Allergen) {
-	sqlStmt := fmt.Sprintf("INSERT INTO %s VALUES( ?, ?, ? )", r.table)
-	stmtIns, err := r.db.Prepare(sqlStmt) // ? = placeholder
-	if err != nil {
-		log.Println(err.Error())
-		return
-	}
-	defer func() {
-		err := stmtIns.Close()
-		if nil != err {
-			log.Println(err.Error())
-		}
-	}()
 
-	bId, _ := allergen.Id.MarshalBinary()
-	sId := allergen.Id.String()
-	_, err = stmtIns.Exec(bId, sId, allergen.Name)
-	if err != nil {
-		log.Println(err.Error())
+	aId, _ := allergen.Id.MarshalBinary()
+	aModel := models.Allergen{
+		Id:           aId,
+		IdUuid:       allergen.Id.String(),
+		AllergenName: allergen.Name,
+		Ingredients:  nil,
+	}
+
+	r.db.Create(&aModel)
+	if len(aModel.IdUuid) == 0 {
+		log.Println("Error inserting allergen")
 		return
 	}
+}
+
+func (r AllergensRepository) allergenAggFromModel(a models.Allergen) *domain.Allergen {
+	var allergen domain.Allergen
+	allergen.Id, _ = uuid.Parse(a.IdUuid)
+	allergen.Name = a.AllergenName
+
+	return &allergen
 }

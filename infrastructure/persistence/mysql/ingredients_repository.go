@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"log"
+	"strings"
 )
 
 func NewIngredientsRepository(db *gorm.DB) IngredientsRepository {
@@ -26,7 +27,13 @@ type IngredientsRepository struct {
 }
 
 func (r IngredientsRepository) FindByName(name string) *domain.Ingredient {
-	panic("implement me")
+	var result *domain.Ingredient
+	var i models.Ingredient
+
+	name = strings.ToUpper(name)
+	r.db.Preload("Allergens").First(&i, "UPPER(ingredient_name) LIKE ?", "%"+name+"%")
+	result = r.ingredientAggFromModel(i)
+	return result
 }
 
 func (r IngredientsRepository) FindById(id uuid.UUID) *domain.Ingredient {
