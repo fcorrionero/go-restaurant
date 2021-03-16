@@ -14,7 +14,12 @@ import (
 	"github.com/fcorrionero/go-restaurant/infrastructure/persistence/mongo"
 	"github.com/fcorrionero/go-restaurant/infrastructure/persistence/mysql"
 	"github.com/fcorrionero/go-restaurant/infrastructure/ui/dishes_http"
+	mysql2 "gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"log"
+	"os"
+	"time"
 )
 
 import (
@@ -46,8 +51,8 @@ func NewMysqlAllergensRepository(db *sql.DB) domain.AllergensRepository {
 	return mysql.NewAllergensRepository(db)
 }
 
-func NewMysqlIngredientsRepository(db *sql.DB) domain.IngredientsRepository {
-	return mysql.NewIngredientsRepository(db)
+func NewMysqlIngredientsRepository(gDb *gorm.DB) domain.IngredientsRepository {
+	return mysql.NewIngredientsRepository(gDb)
 }
 
 func NewMysqlDishesRepository(db *sql.DB) domain.DishesRepository {
@@ -60,5 +65,22 @@ func StartMysqlDB() *sql.DB {
 		log.Fatal(err)
 	}
 
+	return db
+}
+
+func StartGormDB() *gorm.DB {
+	dsn := "root:example@/go_restaurant?charset=utf8mb4&parseTime=True&loc=Local"
+	newLogger := logger.New(log.New(os.Stdout, "\r\n", log.LstdFlags), logger.Config{
+		SlowThreshold: time.Second,
+		LogLevel:      logger.Error,
+		Colorful:      false,
+	},
+	)
+	db, err := gorm.Open(mysql2.Open(dsn), &gorm.Config{
+		Logger: newLogger,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
 	return db
 }

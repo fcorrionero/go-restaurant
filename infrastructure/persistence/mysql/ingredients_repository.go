@@ -1,14 +1,15 @@
 package mysql
 
 import (
-	"database/sql"
 	"fmt"
 	"github.com/fcorrionero/go-restaurant/domain"
+	"github.com/fcorrionero/go-restaurant/infrastructure/persistence/mysql/models"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 	"log"
 )
 
-func NewIngredientsRepository(db *sql.DB) IngredientsRepository {
+func NewIngredientsRepository(db *gorm.DB) IngredientsRepository {
 	return IngredientsRepository{
 		table:     "ingredients",
 		relations: "allergens",
@@ -21,7 +22,7 @@ type IngredientsRepository struct {
 	table     string
 	relations string
 	relTable  string
-	db        *sql.DB
+	db        *gorm.DB
 }
 
 func (r IngredientsRepository) FindByName(name string) *domain.Ingredient {
@@ -29,119 +30,102 @@ func (r IngredientsRepository) FindByName(name string) *domain.Ingredient {
 }
 
 func (r IngredientsRepository) FindById(id uuid.UUID) *domain.Ingredient {
-	panic("implement me")
+	var result *domain.Ingredient
+	var i models.Ingredient
+	bId, err := id.MarshalBinary()
+	if err != nil {
+		log.Println(err.Error())
+		return result
+	}
+
+	r.db.Preload("Allergens").First(&i, "id = ?", bId)
+	result = r.ingredientAggFromModel(i)
+	return result
+}
+
+func (r IngredientsRepository) ingredientAggFromModel(i models.Ingredient) *domain.Ingredient {
+	var ingredient domain.Ingredient
+	ingredient.Id, _ = uuid.Parse(i.IdUuid)
+	ingredient.Name = i.IngredientName
+	for _, a := range i.Allergens {
+		aId, _ := uuid.Parse(a.IdUuid)
+		allergen := domain.Allergen{
+			Id:   aId,
+			Name: a.AllergenName,
+		}
+		ingredient.Allergens = append(ingredient.Allergens, allergen)
+	}
+	return &ingredient
 }
 
 func (r IngredientsRepository) FindAll() []*domain.Ingredient {
-	panic("implement me")
+	// Without allergens for performance
+	var results []*domain.Ingredient
+
+	var ings []models.Ingredient
+	res := r.db.Find(&ings)
+	if res.Error != nil {
+		log.Println(res.Error)
+		return results
+	}
+	for _, i := range ings {
+		results = append(results, r.ingredientAggFromModel(i))
+	}
+
+	return results
 }
 
 func (r IngredientsRepository) FindAllByAllergen(aId uuid.UUID) []*domain.Ingredient {
 	var results []*domain.Ingredient
-	relSql := fmt.Sprintf(
-		"SELECT " +
-			"i.id_uuid, i.ingredient_name, a.id_uuid, a.allergen_name " +
-			"FROM ingredients i " +
-			"INNER JOIN ingredients_allergens ia on i.id = ia.ingredient_id " +
-			"INNER JOIN allergens a on ia.allergen_id = a.id " +
-			"WHERE ia.allergen_id = ? ORDER BY i.id_uuid")
-	sqlStmt, err := r.db.Prepare(relSql)
-	if nil != err {
-		log.Println(err.Error())
-		return results
+	bId, _ := aId.MarshalBinary()
+
+	var a models.Allergen
+	r.db.Preload("Ingredients").First(&a, "id = ?", bId)
+
+	var ids []string
+	for _, i := range a.Ingredients {
+		ids = append(ids, i.IdUuid)
 	}
-	defer func() {
-		err := sqlStmt.Close()
-		if nil != err {
-			log.Println(err.Error())
-		}
-	}()
-	bId, err := aId.MarshalBinary()
-	if err != nil {
-		log.Println(err.Error())
-		return results
+
+	var ingredients []models.Ingredient
+	r.db.Preload("Allergens").Where("id_uuid in ?", ids).Find(&ingredients)
+	for _, i := range ingredients {
+		results = append(results, r.ingredientAggFromModel(i))
 	}
-	rows, err := sqlStmt.Query(bId)
-	if err != nil {
-		log.Println(err.Error())
-		return results
-	}
-	var alId string
-	var iId string
-	var iName string
-	var aName string
-	var ingredient domain.Ingredient
-	for rows.Next() {
-		err := rows.Scan(&iId, &iName, &alId, &aName)
-		if err != nil {
-			log.Println(err.Error())
-			return results
-		}
-		fiId, _ := uuid.Parse(iId)
-		if fiId != ingredient.Id {
-			if len(ingredient.Name) > 0 {
-				results = append(results, &ingredient)
-			}
-			ingredient = domain.Ingredient{
-				Id:        fiId,
-				Allergens: nil,
-				Name:      iName,
-			}
-		}
-		faId, _ := uuid.Parse(alId)
-		allergen := domain.Allergen{
-			Id:   faId,
-			Name: aName,
-		}
-		ingredient.AddAllergen(allergen)
-	}
-	results = append(results, &ingredient)
 
 	return results
 }
 
 func (r IngredientsRepository) Save(ingredient *domain.Ingredient) {
-	sqlStmt := fmt.Sprintf("INSERT INTO %s VALUES( ?, ?, ? )", r.table)
-	stmtIns, err := r.db.Prepare(sqlStmt) // ? = placeholder
-	if err != nil {
-		log.Println(err.Error())
-		return
-	}
-	defer func() {
-		err := stmtIns.Close()
-		if nil != err {
-			log.Println(err.Error())
-		}
-	}()
 
-	bId, _ := ingredient.Id.MarshalBinary()
-	sId := ingredient.Id.String()
-	_, err = stmtIns.Exec(bId, sId, ingredient.Name)
-	if err != nil {
-		log.Println(err.Error())
+	iId, _ := ingredient.Id.MarshalBinary()
+	iModel := models.Ingredient{
+		Id:             iId,
+		IdUuid:         ingredient.Id.String(),
+		IngredientName: ingredient.Name,
+		Allergens:      nil,
+	}
+	r.db.Create(&iModel)
+	if len(iModel.IdUuid) == 0 {
+		log.Println("Error inserting ingredient")
 		return
 	}
-	aRepo := AllergensRepository{
-		table: r.relations,
-		db:    r.db,
-	}
+
+	var aModel models.Allergen
 	for _, a := range ingredient.Allergens {
-		r.saveRelations(ingredient, aRepo, a)
+		bId, _ := a.Id.MarshalBinary()
+		r.db.First(&aModel, "id = ?", bId)
+		if len(aModel.IdUuid) == 0 {
+			aModel.IdUuid = a.Id.String()
+			aModel.Id, _ = a.Id.MarshalBinary()
+			aModel.AllergenName = a.Name
+			r.db.Create(&aModel)
+			if len(aModel.IdUuid) == 0 {
+				log.Println("Error inserting allergen")
+				return
+			}
+		}
+		relSql := fmt.Sprintf("INSERT INTO %s VALUES( ?, ? )", r.relTable)
+		r.db.Exec(relSql, bId, iId)
 	}
-}
-
-func (r IngredientsRepository) saveRelations(ingredient *domain.Ingredient, aRepo AllergensRepository, a domain.Allergen) {
-	allergen := aRepo.FindById(a.Id)
-	if len(allergen.Name) == 0 {
-		aRepo.Save(&a)
-	}
-	relSql := fmt.Sprintf("INSERT INTO %s VALUES( ?, ? )", r.relTable)
-	stmtIns, _ := r.db.Prepare(relSql)
-	bIId, _ := ingredient.Id.MarshalBinary()
-	bAId, _ := a.Id.MarshalBinary()
-	_, err := stmtIns.Exec(bAId, bIId)
-	if err != nil {
-		log.Println(err.Error())
-	}
-	stmtIns.Close()
 }
