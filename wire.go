@@ -39,11 +39,11 @@ func NewMysqlAllergensRepository(db *gorm.DB) domain.AllergensRepository {
 	return mysql.NewAllergensRepository(db)
 }
 
-func NewMysqlIngredientsRepository(gDb *gorm.DB) domain.IngredientsRepository {
-	return mysql.NewIngredientsRepository(gDb)
+func NewMysqlIngredientsRepository(db *gorm.DB) domain.IngredientsRepository {
+	return mysql.NewIngredientsRepository(db)
 }
 
-func NewMysqlDishesRepository(db *sql.DB) domain.DishesRepository {
+func NewMysqlDishesRepository(db *gorm.DB) domain.DishesRepository {
 	return mysql.NewDishesRepository(db)
 }
 
