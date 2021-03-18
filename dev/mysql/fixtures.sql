@@ -5,7 +5,7 @@ USE go_restaurant;
 CREATE TABLE IF NOT EXISTS dishes (
     id BINARY(16) PRIMARY KEY,
     id_uuid VARCHAR(40) NOT NULL,
-    disn_name VARCHAR(255) NOT NULL,
+    dish_name VARCHAR(255) NOT NULL,
     created_at DATETIME NOT NULL
 );
 

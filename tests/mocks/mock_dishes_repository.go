@@ -36,10 +36,10 @@ func (m *MockDishesRepository) EXPECT() *MockDishesRepositoryMockRecorder {
 }
 
 // FindDishById mocks base method.
-func (m *MockDishesRepository) FindDishById(arg0 uuid.UUID) domain.DishAggregate {
+func (m *MockDishesRepository) FindDishById(arg0 uuid.UUID) *domain.DishAggregate {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindDishById", arg0)
-	ret0, _ := ret[0].(domain.DishAggregate)
+	ret0, _ := ret[0].(*domain.DishAggregate)
 	return ret0
 }
 
@@ -50,10 +50,10 @@ func (mr *MockDishesRepositoryMockRecorder) FindDishById(arg0 interface{}) *gomo
 }
 
 // FindDishByName mocks base method.
-func (m *MockDishesRepository) FindDishByName(arg0 string) domain.DishAggregate {
+func (m *MockDishesRepository) FindDishByName(arg0 string) *domain.DishAggregate {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindDishByName", arg0)
-	ret0, _ := ret[0].(domain.DishAggregate)
+	ret0, _ := ret[0].(*domain.DishAggregate)
 	return ret0
 }
 
@@ -92,7 +92,7 @@ func (mr *MockDishesRepositoryMockRecorder) FindDishesByAllergenId(arg0 interfac
 }
 
 // SaveDish mocks base method.
-func (m *MockDishesRepository) SaveDish(arg0 domain.DishAggregate) {
+func (m *MockDishesRepository) SaveDish(arg0 *domain.DishAggregate) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "SaveDish", arg0)
 }

@@ -52,10 +52,26 @@ func (r *DishesRepository) connect(userName string, password string, host string
 func (r DishesRepository) FindDishesByAllergenId(allergenId uuid.UUID) []*domain.DishAggregate {
 	var dishes []*domain.DishAggregate
 
+	filter := bson.M{"ingredients.allergens.id": allergenId.String()}
+	cursor, err := r.collection.Find(r.context, filter)
+	if err != nil {
+		log.Println(err)
+		return dishes
+	}
+	for cursor.Next(context.TODO()) {
+		// create a value into which the single document can be decoded
+		var d domain.DishAggregate
+		err := cursor.Decode(&d)
+		if err != nil {
+			log.Println(err)
+			return dishes
+		}
+		dishes = append(dishes, &d)
+	}
 	return dishes
 }
 
-func (r DishesRepository) FindDishById(dishId uuid.UUID) domain.DishAggregate {
+func (r DishesRepository) FindDishById(dishId uuid.UUID) *domain.DishAggregate {
 	result := domain.DishAggregate{}
 
 	filter := bson.M{"id": dishId}
@@ -63,10 +79,10 @@ func (r DishesRepository) FindDishById(dishId uuid.UUID) domain.DishAggregate {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return result
+	return &result
 }
 
-func (r DishesRepository) FindDishByName(name string) domain.DishAggregate {
+func (r DishesRepository) FindDishByName(name string) *domain.DishAggregate {
 	result := domain.DishAggregate{}
 
 	// Search by name case insensitive with a regex expression
@@ -79,10 +95,10 @@ func (r DishesRepository) FindDishByName(name string) domain.DishAggregate {
 		log.Println(err.Error() + " " + name)
 		log.Println(filter2)
 	}
-	return result
+	return &result
 }
 
-func (r DishesRepository) SaveDish(aggregate domain.DishAggregate) {
+func (r DishesRepository) SaveDish(aggregate *domain.DishAggregate) {
 	if r.client == nil {
 		return
 	}
@@ -121,6 +137,5 @@ func (r DishesRepository) FindDishesByAllergen(allergen string) []*domain.DishAg
 		}
 		dishes = append(dishes, &d)
 	}
-	log.Println(filter)
 	return dishes
 }
