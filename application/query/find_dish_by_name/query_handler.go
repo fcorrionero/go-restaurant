@@ -14,6 +14,6 @@ func New(repo domain.DishesRepository) QueryHandler {
 	}
 }
 
-func (q QueryHandler) Handle(query Query) domain.DishAggregate {
+func (q QueryHandler) Handle(query Query) *domain.DishAggregate {
 	return q.DishesRepository.FindDishByName(query.Name)
 }

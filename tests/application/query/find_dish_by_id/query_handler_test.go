@@ -18,13 +18,13 @@ func TestDishMushBeFound(t *testing.T) {
 
 	id := uuid.New()
 	dish := domain.DishAggregate{Id: id}
-	m.EXPECT().FindDishById(id).Times(1).Return(dish)
+	m.EXPECT().FindDishById(id).Times(1).Return(&dish)
 
 	queryHandler := find_dish_by_id.New(m)
 	query := find_dish_by_id.Query{DishId: id.String()}
 
 	result := queryHandler.Handle(query)
-	assert.Equal(t, result, dish, "Dish found does not match expected result")
+	assert.Equal(t, result, &dish, "Dish found does not match expected result")
 }
 
 func TestOnlyValidUuidAreAllowed(t *testing.T) {

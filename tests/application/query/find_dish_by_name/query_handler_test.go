@@ -16,10 +16,10 @@ func TestDishMustBeFound(t *testing.T) {
 	m := mocks.NewMockDishesRepository(ctrl)
 	name := "Paella"
 	dish := domain.DishAggregate{Name: name}
-	m.EXPECT().FindDishByName(name).Times(1).Return(dish)
+	m.EXPECT().FindDishByName(name).Times(1).Return(&dish)
 
 	queryHandler := find_dish_by_name.New(m)
 	query := find_dish_by_name.Query{Name: name}
 	result := queryHandler.Handle(query)
-	assert.Equal(t, dish, result, "Dishes must be equals")
+	assert.Equal(t, &dish, result, "Dishes must be equals")
 }
