@@ -2,8 +2,8 @@ package mysql
 
 import (
 	"fmt"
-	"github.com/fcorrionero/go-restaurant/domain"
-	"github.com/fcorrionero/go-restaurant/infrastructure/persistence/mysql/models"
+	"github.com/fcorrionero/go-restaurant/src/domain"
+	"github.com/fcorrionero/go-restaurant/src/infrastructure/persistence/mysql/models"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 	"log"

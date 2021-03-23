@@ -1,7 +1,7 @@
 package domain
 
 import (
-	"github.com/fcorrionero/go-restaurant/domain"
+	"github.com/fcorrionero/go-restaurant/src/domain"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"testing"

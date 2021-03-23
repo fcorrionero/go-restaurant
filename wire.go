@@ -3,14 +3,13 @@
 package main
 
 import (
-	"database/sql"
-	"github.com/fcorrionero/go-restaurant/application/query/find_dish_by_id"
-	"github.com/fcorrionero/go-restaurant/application/query/find_dish_by_name"
-	"github.com/fcorrionero/go-restaurant/application/query/find_dishes_by_allergen"
-	"github.com/fcorrionero/go-restaurant/domain"
-	"github.com/fcorrionero/go-restaurant/infrastructure/persistence/mongo"
-	"github.com/fcorrionero/go-restaurant/infrastructure/persistence/mysql"
-	"github.com/fcorrionero/go-restaurant/infrastructure/ui/dishes_http"
+	"github.com/fcorrionero/go-restaurant/src/application/query/find_dish_by_id"
+	"github.com/fcorrionero/go-restaurant/src/application/query/find_dish_by_name"
+	"github.com/fcorrionero/go-restaurant/src/application/query/find_dishes_by_allergen"
+	"github.com/fcorrionero/go-restaurant/src/domain"
+	"github.com/fcorrionero/go-restaurant/src/infrastructure/persistence/mongo"
+	"github.com/fcorrionero/go-restaurant/src/infrastructure/persistence/mysql"
+	"github.com/fcorrionero/go-restaurant/src/infrastructure/ui/dishes_http"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/google/wire"
 	dMysql "gorm.io/driver/mysql"
@@ -45,15 +44,6 @@ func NewMysqlIngredientsRepository(db *gorm.DB) domain.IngredientsRepository {
 
 func NewMysqlDishesRepository(db *gorm.DB) domain.DishesRepository {
 	return mysql.NewDishesRepository(db)
-}
-
-func StartMysqlDB() *sql.DB {
-	db, err := sql.Open("mysql", "root:example@/go_restaurant")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return db
 }
 
 func StartGormDB() *gorm.DB {

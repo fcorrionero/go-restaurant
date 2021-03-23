@@ -1,7 +1,7 @@
 package find_dish_by_id
 
 import (
-	"github.com/fcorrionero/go-restaurant/domain"
+	"github.com/fcorrionero/go-restaurant/src/domain"
 	"github.com/google/uuid"
 )
 

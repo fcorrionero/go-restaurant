@@ -1,7 +1,7 @@
 package add_dish
 
 import (
-	"github.com/fcorrionero/go-restaurant/domain"
+	"github.com/fcorrionero/go-restaurant/src/domain"
 	"github.com/google/uuid"
 	"log"
 	"time"
@@ -9,12 +9,14 @@ import (
 
 type CommandHandler struct {
 	DishesRepository      domain.DishesRepository
+	ReadDishesRepository  domain.DishesRepository
 	IngredientsRepository domain.IngredientsRepository
 }
 
-func New(dRepo domain.DishesRepository, iRepo domain.IngredientsRepository) CommandHandler {
+func New(dRepo domain.DishesRepository, rDRepo domain.DishesRepository, iRepo domain.IngredientsRepository) CommandHandler {
 	return CommandHandler{
 		DishesRepository:      dRepo,
+		ReadDishesRepository:  rDRepo,
 		IngredientsRepository: iRepo,
 	}
 }
@@ -40,4 +42,9 @@ func (c CommandHandler) Handle(command Command) {
 	}
 
 	c.DishesRepository.SaveDish(&d)
+
+	go func() {
+		dIA := c.DishesRepository.FindDishById(id)
+		c.ReadDishesRepository.SaveDish(dIA)
+	}()
 }

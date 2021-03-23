@@ -1,7 +1,7 @@
 package add_ingredient
 
 import (
-	"github.com/fcorrionero/go-restaurant/domain"
+	"github.com/fcorrionero/go-restaurant/src/domain"
 	"github.com/google/uuid"
 	"log"
 )

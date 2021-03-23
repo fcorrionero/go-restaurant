@@ -1,8 +1,8 @@
 package add_ingredient
 
 import (
-	"github.com/fcorrionero/go-restaurant/application/command/add_ingredient"
-	"github.com/fcorrionero/go-restaurant/domain"
+	"github.com/fcorrionero/go-restaurant/src/application/command/add_ingredient"
+	"github.com/fcorrionero/go-restaurant/src/domain"
 	"github.com/fcorrionero/go-restaurant/tests/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"

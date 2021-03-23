@@ -7,7 +7,7 @@ package mocks
 import (
 	reflect "reflect"
 
-	domain "github.com/fcorrionero/go-restaurant/domain"
+	domain "github.com/fcorrionero/go-restaurant/src/domain"
 	gomock "github.com/golang/mock/gomock"
 	uuid "github.com/google/uuid"
 )

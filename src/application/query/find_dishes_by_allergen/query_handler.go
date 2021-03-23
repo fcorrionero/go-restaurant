@@ -1,6 +1,6 @@
 package find_dishes_by_allergen
 
-import "github.com/fcorrionero/go-restaurant/domain"
+import "github.com/fcorrionero/go-restaurant/src/domain"
 
 type QueryHandler struct {
 	DishesRepository domain.DishesRepository

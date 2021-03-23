@@ -2,9 +2,9 @@ package dishes_http
 
 import (
 	"fmt"
-	"github.com/fcorrionero/go-restaurant/application/query/find_dish_by_id"
-	"github.com/fcorrionero/go-restaurant/application/query/find_dish_by_name"
-	"github.com/fcorrionero/go-restaurant/application/query/find_dishes_by_allergen"
+	"github.com/fcorrionero/go-restaurant/src/application/query/find_dish_by_id"
+	"github.com/fcorrionero/go-restaurant/src/application/query/find_dish_by_name"
+	"github.com/fcorrionero/go-restaurant/src/application/query/find_dishes_by_allergen"
 	"log"
 	"net/http"
 	"strings"

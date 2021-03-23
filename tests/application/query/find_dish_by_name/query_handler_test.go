@@ -1,8 +1,8 @@
 package find_dish_by_name
 
 import (
-	"github.com/fcorrionero/go-restaurant/application/query/find_dish_by_name"
-	"github.com/fcorrionero/go-restaurant/domain"
+	"github.com/fcorrionero/go-restaurant/src/application/query/find_dish_by_name"
+	"github.com/fcorrionero/go-restaurant/src/domain"
 	"github.com/fcorrionero/go-restaurant/tests/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
