@@ -15,11 +15,11 @@ func New(iRepo domain.IngredientsRepository, aRepo domain.AllergensRepository) C
 	return CommandHandler{IngredientsRepository: iRepo, AllergensRepository: aRepo}
 }
 
-func (c CommandHandler) Handle(command Command) {
+func (c CommandHandler) Handle(command Command) error {
 	id, err := uuid.Parse(command.Id)
 	if err != nil {
 		log.Println("Invalid allergen id")
-		return
+		return err
 	}
 	i := domain.Ingredient{
 		Id:        id,
@@ -34,4 +34,6 @@ func (c CommandHandler) Handle(command Command) {
 	}
 
 	c.IngredientsRepository.Save(&i)
+
+	return nil
 }

@@ -14,15 +14,20 @@ func New(repo domain.AllergensRepository) CommandHandler {
 	return CommandHandler{AllergenRepository: repo}
 }
 
-func (c CommandHandler) Handle(command Command) {
+func (c CommandHandler) Handle(command Command) error {
 	id, err := uuid.Parse(command.Id)
 	if err != nil {
 		log.Println("Invalid allergen id")
-		return
+		return err
 	}
 	a := domain.Allergen{
 		Id:   id,
 		Name: command.Name,
 	}
-	c.AllergenRepository.Save(&a)
+	err = c.AllergenRepository.Save(&a)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

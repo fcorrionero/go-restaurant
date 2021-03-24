@@ -6,6 +6,7 @@ import (
 	"github.com/fcorrionero/go-restaurant/tests/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -49,4 +50,25 @@ func TestIngredientMustBeSaved(t *testing.T) {
 
 	commandHandler := add_ingredient.New(iM, aM)
 	commandHandler.Handle(command)
+}
+
+func TestOnlyValidUuidsAreProcessed(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	iM := mocks.NewMockIngredientsRepository(ctrl)
+	aM := mocks.NewMockAllergensRepository(ctrl)
+
+	commandHandler := add_ingredient.New(iM, aM)
+
+	command := add_ingredient.Command{
+		Id:           "invalid uuid",
+		Name:         "ingredient name",
+		AllergensIds: []string{},
+	}
+
+	err := commandHandler.Handle(command)
+
+	assert.True(t, err != nil)
+
 }

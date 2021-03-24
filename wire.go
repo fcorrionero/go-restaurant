@@ -3,6 +3,9 @@
 package main
 
 import (
+	"github.com/fcorrionero/go-restaurant/src/application/command/add_allergen"
+	"github.com/fcorrionero/go-restaurant/src/application/command/add_dish"
+	"github.com/fcorrionero/go-restaurant/src/application/command/add_ingredient"
 	"github.com/fcorrionero/go-restaurant/src/application/query/find_dish_by_id"
 	"github.com/fcorrionero/go-restaurant/src/application/query/find_dish_by_name"
 	"github.com/fcorrionero/go-restaurant/src/application/query/find_dishes_by_allergen"
@@ -28,6 +31,15 @@ func InitializeDishesRepository() domain.DishesRepository {
 func InitializeDishesHttpController(dishesRepository domain.DishesRepository) dishes_http.DishesHttpController {
 	wire.Build(dishes_http.NewDishesHttpController, find_dish_by_id.New, find_dish_by_name.New, find_dishes_by_allergen.New)
 	return dishes_http.DishesHttpController{}
+}
+
+func InitializeCrudHttpController() dishes_http.CrudHttpController {
+	db := StartGormDB()
+	rDRepo := NewMongoDishesRepository()
+	dRepo := NewMysqlDishesRepository(db)
+	iRepo := NewMysqlIngredientsRepository(db)
+	aRepo := NewMysqlAllergensRepository(db)
+	return dishes_http.NewCrudController(add_allergen.New(aRepo), add_ingredient.New(iRepo, aRepo), add_dish.New(dRepo, rDRepo, iRepo))
 }
 
 func NewMongoDishesRepository() domain.DishesRepository {

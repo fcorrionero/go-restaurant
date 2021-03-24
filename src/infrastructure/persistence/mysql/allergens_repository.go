@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"errors"
 	"github.com/fcorrionero/go-restaurant/src/domain"
 	"github.com/fcorrionero/go-restaurant/src/infrastructure/persistence/mysql/models"
 	"github.com/google/uuid"
@@ -65,7 +66,7 @@ func (r AllergensRepository) FindById(id uuid.UUID) *domain.Allergen {
 	return result
 }
 
-func (r AllergensRepository) Save(allergen *domain.Allergen) {
+func (r AllergensRepository) Save(allergen *domain.Allergen) error {
 
 	aId, _ := allergen.Id.MarshalBinary()
 	aModel := models.Allergen{
@@ -78,8 +79,10 @@ func (r AllergensRepository) Save(allergen *domain.Allergen) {
 	r.db.Create(&aModel)
 	if len(aModel.IdUuid) == 0 {
 		log.Println("Error inserting allergen")
-		return
+		return errors.New("error inserting allergen")
 	}
+
+	return nil
 }
 
 func (r AllergensRepository) allergenAggFromModel(a models.Allergen) *domain.Allergen {
